@@ -2,6 +2,7 @@
 #include <math.h>
 #include <stdlib.h>
 #include <string.h>
+#include "kmeans.h"
 
 typedef struct PointType {
     double *data;
@@ -113,28 +114,25 @@ void handleError(void) {
     exit(1);
 }
 
-double **kmeans(double *datapoints[], int numOfPoints, int lengths[], int k, int iter)
+double **kmeans(double **datapoints, double **centroids, int numOfPoints, int pLength, int k, int iter)
 {
     Cluster *clusters;
     PointList points = {NULL, 0};
     Point p;
     int i, j, converged = 1;
-    double **centroids;
     for (i = 0; i < numOfPoints; i ++) {
         p.data = datapoints[i];
-        p.length = lengths[i];
+        p.length = pLength;
         addPointToList(&points, p);
     }
     clusters = (Cluster *)calloc(k, sizeof(Cluster));
     if (clusters == NULL) {
         handleError();
     }
-    centroids = (double **)calloc(k, sizeof(double *));
-    if (centroids == NULL) {
-        handleError();
-    }
     for (i = 0; i < k; i++) {
-        clusters[i].centroid = points.pointsArr[i];
+        p.data = centroids[i];
+        p.length = pLength;
+        clusters[i].centroid = p;
     }
     for (i = 0; i < iter; i++) {
         for (j = 0; j < points.length; j++) {
