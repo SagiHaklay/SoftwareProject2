@@ -6,8 +6,8 @@ static PyObject* fit(PyObject* self, PyObject* args)
 {
     PyObject *lstPoints, *lstCentroids, *point, *item, *result;
     int k, iter, n, plength, i, j;
-    double **datapoints, **centroids, num;
-    if (!PyArg_ParseTuple(args, "OOi", &lstPoints, &lstCentroids, &iter)) {
+    double **datapoints, **centroids, num, eps;
+    if (!PyArg_ParseTuple(args, "OOid", &lstPoints, &lstCentroids, &iter, &eps)) {
         return NULL;
     }
 
@@ -58,7 +58,7 @@ static PyObject* fit(PyObject* self, PyObject* args)
         }
     }
 
-    centroids = kmeans(datapoints, centroids, n, plength, k, iter);
+    centroids = kmeans(datapoints, centroids, n, plength, k, iter, eps);
     result = PyList_New(k);
     for (i = 0; i < k; i++) {
         point = PyList_New(plength);

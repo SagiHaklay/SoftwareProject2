@@ -19,13 +19,11 @@ typedef struct ClusterType {
     PointList points;
 } Cluster;
 
-double eps = 0.001;
-
 double distance(Point p1, Point p2);
 void addPointToList(PointList*, Point);
 void printPointList(PointList);
 void clearPointList(PointList*);
-int updateCentroid(Cluster*);
+int updateCentroid(Cluster* cluster, double eps);
 void printPoint(Point);
 Cluster *matchCluster(Point point, Cluster clusters[], int k);
 void handleError(void);
@@ -65,7 +63,7 @@ void clearPointList(PointList* list) {
     list->length = 0;
 }
 
-int updateCentroid(Cluster* cluster){
+int updateCentroid(Cluster* cluster, double eps){
     double *mean = NULL;
     Point newCentroid = {NULL, 0};
     int converged, i, j;
@@ -114,7 +112,7 @@ void handleError(void) {
     exit(1);
 }
 
-double **kmeans(double **datapoints, double **centroids, int numOfPoints, int pLength, int k, int iter)
+double **kmeans(double **datapoints, double **centroids, int numOfPoints, int pLength, int k, int iter, double eps)
 {
     Cluster *clusters;
     PointList points = {NULL, 0};
@@ -141,7 +139,7 @@ double **kmeans(double **datapoints, double **centroids, int numOfPoints, int pL
         }
         converged = 1;
         for (j = 0; j < k; j++) {
-            converged = converged && updateCentroid(&clusters[j]);
+            converged = converged && updateCentroid(&clusters[j], eps);
             clearPointList(&clusters[j].points);
         }
         if (converged) {
