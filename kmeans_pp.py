@@ -8,6 +8,12 @@ class Point:
 
     def __str__(self) -> str:
         return self.data.__str__()
+    
+    def __eq__(self, __value: object) -> bool:
+        for i in range(len(self.data)):
+            if self.data[i] != __value.data[i]:
+                return False
+        return True
 
     def distance(self, other):
         sum = 0
@@ -52,9 +58,11 @@ def read_from_file(fname):
         current_line = [float(x) for x in current_line]
         list_of_points.append(current_line)
     return list_of_points
-datapoints = read_from_file('tests/input_1.txt')
-centroids = kmeans_pp(datapoints, 3)
-centroids = kmeans.fit(datapoints, centroids, 600, 0.001)
+datapoints = read_from_file('/home/sagi/software-project/SoftwareProject2/tests/input_1.txt')
+points = [Point(p) for p in datapoints]
+centroids = kmeans_pp(points, 3)
+arr_centroids = [p.data for p in centroids]
+centroids = kmeans.fit(datapoints, arr_centroids, 600, 0.001)
 for cent in centroids:
     data = [float("%.4f" % i) for i in cent]
     print(*data, sep=",")
