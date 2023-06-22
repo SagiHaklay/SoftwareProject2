@@ -31,6 +31,44 @@ class Point:
             min_dist = min(min_dist, curr_dist)
         return min_dist
     
+    def match_cluster(self, list_of_clusters):
+        min_distance = self.distance(list_of_clusters[0].centroid)
+        nearest_cluster = list_of_clusters[0]
+        for cur_cluster in list_of_clusters:
+            distance = self.distance(cur_cluster.centroid)
+            if distance < min_distance:
+                min_distance = distance
+                nearest_cluster = cur_cluster
+        return nearest_cluster
+    
+class Cluster:
+    def __init__(self, centroid) -> None:
+        self.centroid = centroid
+        self.points = []
+
+    def __str__(self) -> str:
+        return self.centroid.__str__()
+
+    def add_point(self, point):
+        self.points.append(point)
+
+    def clear(self):
+        self.points.clear()
+
+    def update_centroid(self):
+        mean = [0] * len(self.centroid.data)
+        for i in range(len(self.centroid.data)):
+            print(mean[i])
+            for p in self.points:
+                mean[i] += p.data[i]
+            print(mean[i])
+            mean[i] /= len(self.points)
+            print(mean[i])
+        new_centroid = Point(mean, self.centroid.index)
+        converged = new_centroid.distance(self.centroid) < eps
+        self.centroid = new_centroid
+        return converged
+    
 def choose_centroid(points, centroids, is_uniform=False):
     # point_matrix = np.array([p.data for p in points])
     # rng = np.random.default_rng(0)
@@ -119,7 +157,7 @@ indicies = [("%d" % cent.index) for cent in centroids]
 print(*indicies, sep=',')
 arr_centroids = [p.data for p in centroids]
 datapoints = [p.data for p in points]
-centroids = kmeans.fit(datapoints, arr_centroids, iter, 0)
+centroids = kmeans.fit(datapoints, arr_centroids, iter, eps)
 for cent in centroids:
     data = [float("%.4f" % i) for i in cent]
     print(*data, sep=",")

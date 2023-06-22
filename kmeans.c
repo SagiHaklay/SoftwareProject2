@@ -32,7 +32,7 @@ double distance(Point p1, Point p2) {
     double sum = 0.0;
     int i;
     for (i = 0; i < p1.length; i++){
-        sum += pow(p1.data[i] - p2.data[i], 2);
+        sum += pow(p1.data[i] - p2.data[i], 2.0);
     }
     return sqrt(sum);
 }
@@ -81,6 +81,7 @@ int updateCentroid(Cluster* cluster, double eps){
     newCentroid.data = mean;
     newCentroid.length = cluster->centroid.length;
     converged = distance(cluster->centroid, newCentroid) < eps;
+    free(cluster->centroid.data);
     cluster->centroid = newCentroid;
     return converged;
 }
@@ -96,8 +97,8 @@ void printPoint(Point point) {
 Cluster *matchCluster(Point point, Cluster clusters[], int k) {
     int i;
     double minDistance = distance(point, clusters[0].centroid);
-    Cluster *nearestCluster = clusters;
-    for (i = 1; i < k; i++) {
+    Cluster *nearestCluster = &clusters[0];
+    for (i = 0; i < k; i++) {
         double currDistance = distance(point, clusters[i].centroid);
         if (currDistance < minDistance){
             minDistance = currDistance;
@@ -128,22 +129,22 @@ double **kmeans(double **datapoints, double **centroids, int numOfPoints, int pL
         handleError();
     }
     for (i = 0; i < k; i++) {
-        p.data = centroids[i];
-        p.length = pLength;
-        clusters[i].centroid = p;
+        clusters[i].centroid.data = centroids[i];
+        clusters[i].centroid.length = pLength;
     }
     for (i = 0; i < iter; i++) {
         for (j = 0; j < points.length; j++) {
             Cluster *nearestCluster = matchCluster(points.pointsArr[j], clusters, k);
             addPointToList(&nearestCluster->points, points.pointsArr[j]);
         }
-        converged = 1;
         for (j = 0; j < k; j++) {
-            converged = converged && updateCentroid(&clusters[j], eps);
+            converged = updateCentroid(&clusters[j], eps) && converged;
             clearPointList(&clusters[j].points);
         }
         if (converged) {
             break;
+        } else {
+            converged = 1;
         }
     }
     for (int i = 0; i < k; i++) {
