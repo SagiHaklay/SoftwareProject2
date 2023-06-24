@@ -151,7 +151,13 @@ if k <= 1 or k >= len(points):
     k_error()
 if iter <= 1 or iter >= 1000:
     iter_error()
+if not sys.argv[-3].isdigit():
+    print("An Error has occured")
+    sys.exit()
 eps = int(sys.argv[-3])
+if eps < 0:
+    print("An Error has occured")
+    sys.exit()
 centroids = kmeans_pp(points, k)
 indicies = [("%d" % cent.index) for cent in centroids]
 print(*indicies, sep=',')
